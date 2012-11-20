@@ -1,53 +1,48 @@
 import kivy
+kivy.require('1.0.8')
+
 from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.uix.label import Label
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty
-from kivy.vector import Vector
-from kivy.factory import Factory
-from kivy.clock import Clock
-from random import randint, random
+from kivy.core.audio import SoundLoader
+from kivy.properties import StringProperty, ObjectProperty
 
 
-class Radar(Widget):
+class RadarButton(CheckBox):
 
-    def start(self):
-        print "start"
+    filename = StringProperty(None)
+    sound = ObjectProperty(None)
 
-    def update(self, *args):
-        pass
+    def on_filename(self, instance, value):
+        # the first time that the filename is set, we are loading the sample
+        if self.sound is None:
+            self.sound = SoundLoader.load(value)
 
-    def on_touch_move(self, touch):
-        print "touch", touch
+    def on_active(self, *args, **kwargs):
+        # stop the sound if it's currently playing
+        if self.sound.status != 'stop':
+            self.sound.stop()
+        self.sound.play()
 
 
-class RadarPoint(CheckBox):
+class RadarBackground(GridLayout):
     pass
-
-
-class RadarContainer(GridLayout):
-    pass
-
-
-Factory.register("Radar", Radar)
 
 
 class RadarApp(App):
+
     def build(self):
-        radar = Radar()
-        radar.start()
-        Clock.schedule_interval(radar.update, 1.0/60.0)
 
-        container = RadarContainer(spacing=5)
-        radar.add_widget(Label(text='Radar', font_size=32, size_hint_y=None))
-        radar.add_widget(container)
-        for i in xrange(5):
-            pt = RadarPoint(group='radar')
-            container.add_widget(pt)
-        return radar
+        root = RadarBackground(spacing=5)
+        for i in xrange(0, 100):
+            btn = RadarButton(
+                text="", filename="sound.wav", group=str(i),
+                size_hint=(None, None), halign='center',
+                size=(64, 64))
+            root.add_widget(btn)
 
+        return root
 
 if __name__ == '__main__':
     RadarApp().run()

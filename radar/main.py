@@ -7,6 +7,7 @@ from kivy.uix.checkbox import CheckBox
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.audio import SoundLoader
 from kivy.properties import StringProperty, ObjectProperty
+from kivy.clock import Clock
 
 
 class RadarButton(CheckBox):
@@ -19,11 +20,15 @@ class RadarButton(CheckBox):
         if self.sound is None:
             self.sound = SoundLoader.load(value)
 
-    def on_active(self, *args, **kwargs):
+    def play_sound(self):
         # stop the sound if it's currently playing
         if self.sound.status != 'stop':
             self.sound.stop()
         self.sound.play()
+
+    def update(self, *args):
+        if self.active:
+            self.play_sound()
 
 
 class RadarBackground(GridLayout):
@@ -40,8 +45,8 @@ class RadarApp(App):
                 text="", filename="sound.wav", group=str(i),
                 size_hint=(None, None), halign='center',
                 size=(64, 64))
+            Clock.schedule_interval(btn.update, 50.0/60.0 + i/10)
             root.add_widget(btn)
-
         return root
 
 if __name__ == '__main__':

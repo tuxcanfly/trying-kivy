@@ -40,13 +40,14 @@ class RadarApp(App):
     def build(self):
 
         root = RadarBackground(spacing=5)
-        for i in xrange(0, 100):
-            btn = RadarButton(
-                text="", filename="sound.wav", group=str(i),
-                size_hint=(None, None), halign='center',
-                size=(64, 64))
-            Clock.schedule_interval(btn.update, 50.0/60.0 + i/10)
-            root.add_widget(btn)
+        for i in range(0, 10):
+            for j in range(0, 10):
+                btn = RadarButton(
+                    text="", filename="wav/%s.wav" % (j), group=str(i),
+                    size_hint=(None, None), halign='center',
+                    size=(64, 64))
+                Clock.schedule_interval(btn.update, 50.0/60.0 + i*j/10)
+                root.add_widget(btn)
         return root
 
 if __name__ == '__main__':
